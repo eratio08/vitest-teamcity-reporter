@@ -1,6 +1,6 @@
 {
     "name": "vitest-teamcity-reporter",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "description": "A TeamCity reporter for vitest.",
     "repository": {
         "type": "git",
