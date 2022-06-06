@@ -1,24 +1,27 @@
 import { Awaitable, File, Reporter, TaskResultPack, UserConsoleLog } from 'vitest';
 import { print, printTask, printTaskResultPack } from './printer';
+import type { TaskIndex } from './printer'
 
 class TeamCityReporter implements Reporter {
-    onCollected(files?: File[]): Awaitable<void> {
-        files?.forEach(printTask);
+  private taskIndex: TaskIndex = new Map()
 
-        return Promise.resolve();
-    }
+  onCollected(files?: File[]): Awaitable<void> {
+    files?.forEach(printTask(this.taskIndex));
 
-    onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
-        packs.reverse().forEach(printTaskResultPack);
+    return Promise.resolve();
+  }
 
-        return Promise.resolve();
-    }
+  onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
+    packs.reverse().forEach(printTaskResultPack(this.taskIndex));
 
-    onUserConsoleLog(log: UserConsoleLog): Awaitable<void> {
-        print(log);
+    return Promise.resolve();
+  }
 
-        return Promise.resolve();
-    }
+  onUserConsoleLog(log: UserConsoleLog): Awaitable<void> {
+    print(log);
+
+    return Promise.resolve();
+  }
 }
 
 export { TeamCityReporter };
