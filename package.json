@@ -18,11 +18,12 @@
     "types": "lib/index.d.ts",
     "scripts": {
         "clean": "rimraf lib",
-        "test": "vitest run",
+        "test": "vitest run --coverage",
         "build": "tsc -p tsconfig.lib.json"
     },
     "devDependencies": {
         "@types/node": "^17.0.40",
+        "c8": "^7.11.3",
         "eslint": "^8.17.0",
         "prettier": "^2.6.2",
         "rimraf": "^3.0.2",
