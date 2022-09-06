@@ -1,5 +1,5 @@
 
-import { Task, TaskResultPack, Test } from 'vitest';
+import { Benchmark, Task, TaskResultPack, Test } from 'vitest';
 // eslint-disable-next-line no-console
 const print = (message: unknown, ...args: string[]) => console.info(message, ...args);
 
@@ -28,7 +28,7 @@ const escape = (str: string = ''): string => {
     .replace(/\u2029/g, '|p')
     .replace(/'/g, "|'");
 };
-const buildTestName = (task: Test) => `${escape(task.name)}`;
+const buildTestName = (task: Test | Benchmark) => `${escape(task.name)}`;
 
 type TaskIndex = Map<string, Task>
 
