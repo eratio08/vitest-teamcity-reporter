@@ -1,6 +1,6 @@
 {
     "name": "vitest-teamcity-reporter",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "A TeamCity reporter for vitest.",
     "repository": {
         "type": "git",
@@ -22,17 +22,17 @@
         "build": "pnpm clean && tsc -p tsconfig.lib.json"
     },
     "devDependencies": {
-        "@types/node": "^18.6.3",
-        "c8": "^7.11.3",
-        "eslint": "^8.17.0",
-        "prettier": "^2.6.2",
+        "@types/node": "^18.7.15",
+        "@vitest/coverage-c8": "^0.23.1",
+        "eslint": "^8.23.0",
+        "prettier": "^2.7.1",
         "rimraf": "^3.0.2",
-        "typescript": "^4.7.3",
-        "vitest": "^0.20.2"
+        "typescript": "^4.8.2",
+        "vitest": "^0.23.1"
     },
     "peerDependencies": {
         "typescript": "3.x || 4.x",
-        "vitest": ">=0.20.2"
+        "vitest": ">=0.23.1"
     },
     "author": "Eike Lurz<eike.lurz@tuta.io>",
     "license": "MIT"
