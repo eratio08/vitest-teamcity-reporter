@@ -71,10 +71,10 @@ const printTaskResultPack = (taskIndex: TaskIndex) => ([id, result]: TaskResultP
           break;
         case 'fail':
           printTestFailed(name, {
-            message: result.error?.message,
-            details: result.error?.stackStr,
-            actual: result.error?.actual,
-            expected: result.error?.expected,
+            message: escape(result.error?.message ?? ''),
+            details: escape(result.error?.stackStr ?? ''),
+            actual: escape(result.error?.actual ?? ''),
+            expected: escape(result.error?.expected ?? ''),
           });
           break;
         default:
