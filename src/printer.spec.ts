@@ -197,6 +197,39 @@ describe('printer', () => {
       //then
       expect(console.info).toHaveBeenCalledWith(`##teamcity[testFailed name='${test.name}' message='' details='' actual='' expected='' type='comparisonFailure']`)
     })
+
+    it("should escape detail information on printing failed suite", () => {
+      //given
+      const unescaped_string = "'\n\r|[]"
+      const escaped_string = "|'|n|r|||[|]"
+
+      const taskResult: TaskResultPack[1] = {
+        state: 'fail',
+        error: {
+          name: unescaped_string,
+          message: unescaped_string,
+          stackStr: unescaped_string,
+          actual: unescaped_string,
+          expected: unescaped_string,
+        }
+      }
+      const test: Test = {
+        type: 'test',
+        mode: 'run',
+        id: 'some-test',
+        name: 'some-test',
+        suite: new (vi.fn()),
+        context: new (vi.fn())
+      }
+      const taskIndex = new Map()
+      taskIndex.set('id', test)
+
+      //when
+      printTaskResultPack(taskIndex)(['id', taskResult])
+
+      //then
+      expect(console.info).toHaveBeenCalledWith(`##teamcity[testFailed name='${test.name}' message='${escaped_string}' details='${escaped_string}' actual='${escaped_string}' expected='${escaped_string}' type='comparisonFailure']`)
+    })
   })
 })
 
