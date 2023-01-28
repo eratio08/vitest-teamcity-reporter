@@ -15,8 +15,8 @@ import { defineConfig } from 'vitest/config';
 import TeamCityReporter from 'vitest-teamcity-reporter';
 
 export default defineConfig({
-    test: {
-        reporters: [new TeamCityReporter()],
-    },
+  test: {
+    reporters: [TeamCityReporter],
+  },
 });
 ```
