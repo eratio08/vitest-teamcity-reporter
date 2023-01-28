@@ -29,8 +29,7 @@ jobs:
           check-latest: true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install ${{ github.actor != 'dependabot[bot]' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
 
       - name: Run Unit-Tests
         run: pnpm test
-
