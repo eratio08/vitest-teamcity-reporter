@@ -35,7 +35,8 @@ type TaskIndex = Map<string, Task>
 const printTask = (taskIndex: TaskIndex) => (task: Task) => {
   if (task.type === 'suite') {
     if (task.mode === 'run') {
-      printSuiteStarted(task.name);
+      const name = escape(task.name);
+      printSuiteStarted(name);
     }
     taskIndex.set(task.id, task);
     task.tasks.forEach(printTask(taskIndex));
