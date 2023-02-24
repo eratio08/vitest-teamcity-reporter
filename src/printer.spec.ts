@@ -230,5 +230,30 @@ describe('printer', () => {
       //then
       expect(console.info).toHaveBeenCalledWith(`##teamcity[testFailed name='${test.name}' message='${escaped_string}' details='${escaped_string}' actual='${escaped_string}' expected='${escaped_string}' type='comparisonFailure']`)
     })
+
+    it("should escape testSuite name", () => {
+      //given
+      const unescaped_string = "'\n\r|[]"
+      const escaped_string = "|'|n|r|||[|]"
+
+      const suite: File = {
+        type: 'suite',
+        mode: 'run',
+        id: 'some-id',
+        name: unescaped_string,
+        tasks: [],
+        filepath: '/some/path'
+      }      
+      
+      const taskIndex = new Map()
+
+      //when
+      printTask(taskIndex)(suite)
+
+      //then
+      expect(console.info).toHaveBeenCalledWith(`##teamcity[testSuiteStarted name='${escaped_string}']`)
+      expect(taskIndex).toContain(suite)
+
+    })
   })
 })
