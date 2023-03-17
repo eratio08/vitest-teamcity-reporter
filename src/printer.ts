@@ -28,7 +28,7 @@ const escape = (str: string = ''): string => {
     .replace(/\u2029/g, '|p')
     .replace(/'/g, "|'");
 };
-const buildTestName = (task: Test | Benchmark) => `${escape(task.name)}`;
+const buildTestName = (task: Task) => `${escape(task.name)}`;
 
 type TaskIndex = Map<string, Task>
 
