@@ -1,3 +1,3 @@
-import { TeamCityReporter } from './reporter';
+import {TeamCityReporter} from './reporter';
 
 export default TeamCityReporter;

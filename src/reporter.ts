@@ -1,27 +1,35 @@
-import { Awaitable, File, Reporter, TaskResultPack, UserConsoleLog } from 'vitest';
-import { print, printTask, printTaskResultPack } from './printer';
-import type { TaskIndex } from './printer'
+import {Awaitable, File, Reporter, TaskResultPack, UserConsoleLog, Vitest} from 'vitest';
+import {Printer} from './printer';
 
-class TeamCityReporter implements Reporter {
-  private taskIndex: TaskIndex = new Map()
+export interface VitestLogger {
+    log(...args: any[]): void;
 
-  onCollected(files?: File[]): Awaitable<void> {
-    files?.forEach(printTask(this.taskIndex));
-
-    return Promise.resolve();
-  }
-
-  onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
-    packs.reverse().forEach(printTaskResultPack(this.taskIndex));
-
-    return Promise.resolve();
-  }
-
-  onUserConsoleLog(log: UserConsoleLog): Awaitable<void> {
-    print(log);
-
-    return Promise.resolve();
-  }
+    console: Console,
 }
 
-export { TeamCityReporter };
+class TeamCityReporter implements Reporter {
+    private _logger!: VitestLogger;
+    private _printer!: Printer;
+
+    onInit(ctx: Vitest) {
+        this._logger = ctx.logger;
+        this._printer = new Printer(this._logger);
+    }
+
+    onCollected(files?: File[]): Awaitable<void> {
+        files?.forEach(this._printer.addFile);
+        return Promise.resolve();
+    }
+
+    onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
+        packs.reverse().forEach(this._printer.handeUpdate);
+        return Promise.resolve();
+    }
+
+    onUserConsoleLog(log: UserConsoleLog): Awaitable<void> {
+        this._logger.log(log);
+        return Promise.resolve();
+    }
+}
+
+export {TeamCityReporter};

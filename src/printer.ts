@@ -1,90 +1,70 @@
+import {File, Suite, Task, Test} from "vitest";
+import {SuitMessage} from "./messages/suite-message";
+import {escape} from "./utils/escape";
+import {TestMessage} from "./messages/test-message";
+import {TaskResultPack} from "vitest";
+import {VitestLogger} from "./reporter";
 
-import { Benchmark, Task, TaskResultPack, Test } from 'vitest';
-// eslint-disable-next-line no-console
-const print = (message: unknown, ...args: string[]) => console.info(message, ...args);
 
-// See https://www.jetbrains.com/help/teamcity/service-messages.html#Supported+Test+ServiceMessages
-const printSuiteStarted = (name: string) => print(`##teamcity[testSuiteStarted name='${name}']`);
-const printTestStarted = (name: string) => print(`##teamcity[testStarted name='${name}']`);
-const printTestFailed = (name: string, { message = '', details = '', actual = '', expected = '' }) =>
-  print(
-    `##teamcity[testFailed name='${name}' message='${message}' details='${details}' actual='${actual}' expected='${expected}' type='comparisonFailure']`
-  );
-const printTestIgnored = (name: string, message = '') => print(`##teamcity[testIgnored name='${name}' message='${message}']`);
-const printTestFinished = (name: string, duration: number) => print(`##teamcity[testFinished name='${name}' duration='${duration}']`);
-const printSuiteFinished = (name: string) => print(`##teamcity[testSuiteFinished name='${name}']`);
+type PotentialMessage = string | (() => string | string[]);
+type PotentialMessages = Array<PotentialMessage>;
 
-const escape = (str: string = ''): string => {
-  return str
-    .toString()
-    .replace(/\x1B.*?m/g, '')
-    .replace(/\|/g, '||')
-    .replace(/\n/g, '|n')
-    .replace(/\r/g, '|r')
-    .replace(/\[/g, '|[')
-    .replace(/\]/g, '|]')
-    .replace(/\u0085/g, '|x')
-    .replace(/\u2028/g, '|l')
-    .replace(/\u2029/g, '|p')
-    .replace(/'/g, "|'");
-};
-const buildTestName = (task: Task) => `${escape(task.name)}`;
+export class Printer {
+    private fileMap = new Map<string, PotentialMessages>;
 
-type TaskIndex = Map<string, Task>
-
-const printTask = (taskIndex: TaskIndex) => (task: Task) => {
-  if (task.type === 'suite') {
-    if (task.mode === 'run') {
-      const name = escape(task.name);
-      printSuiteStarted(name);
+    constructor(private logger: VitestLogger) {
     }
-    taskIndex.set(task.id, task);
-    task.tasks.forEach(printTask(taskIndex));
-  }
-  else if (task.type === 'test') {
-    const name = buildTestName(task);
-    if (task.mode === 'skip') {
-      printTestIgnored(name);
-    }
-    if (task.mode === 'run') {
-      printTestStarted(name);
-    }
-    taskIndex.set(task.id, task);
-  }
-};
 
-const printTaskResultPack = (taskIndex: TaskIndex) => ([id, result]: TaskResultPack) => {
-  if (taskIndex.has(id)) {
-    const task = taskIndex.get(id);
-    if (!task || !result) return;
-
-    if (task.type === 'suite') {
-      const name = escape(task.name);
-      printSuiteFinished(name);
-    } else {
-      const name = buildTestName(task);
-      switch (result.state) {
-        case 'skip':
-          printTestIgnored(name);
-          break;
-        case 'pass':
-          printTestFinished(name, result.duration ?? 0);
-          break;
-        case 'fail':
-          printTestFailed(name, {
-            message: escape(result.error?.message ?? ''),
-            details: escape(result.error?.stackStr ?? ''),
-            actual: escape(result.error?.actual ?? ''),
-            expected: escape(result.error?.expected ?? ''),
-          });
-          break;
-        default:
-          // do nothing
-          break;
-      }
+    public addFile = (file: File) => {
+        const suitMessage = new SuitMessage(file.id, escape(file.name));
+        const messages = [
+            suitMessage.started(),
+            ...file.tasks.flatMap(this.handleTask),
+            suitMessage.finished(),
+        ]
+        this.fileMap.set(file.id, messages);
     }
-  }
-};
 
-export { printTask, printTaskResultPack, print };
-export type { TaskIndex };
+    public handeUpdate = ([id, result]: TaskResultPack) => {
+        const messages = this.fileMap.get(id);
+        if (messages && result && result.state !== 'run') {
+            messages
+                .flatMap((message: PotentialMessage) => typeof message === 'string' ? message : message())
+                .forEach(message => this.logger.console.info(message));
+        }
+    }
+
+    private handleTask = (task: Task): PotentialMessage | PotentialMessage[] => {
+        if (task.type === 'test') {
+            return this.handleTest(task);
+        }
+        if (task.type === 'suite' && task.mode === 'run') {
+            return this.handleSuite(task)
+        }
+        return []
+    }
+
+    private handleSuite = (suite: Suite): PotentialMessage[] => {
+        const suitMessage = new SuitMessage(suite.file!.id, escape(suite.name));
+        return [
+            suitMessage.started(),
+            ...suite.tasks.flatMap(this.handleTask),
+            suitMessage.finished(),
+        ]
+    }
+
+    private handleTest = (test: Test): PotentialMessage => {
+        const testMessage = new TestMessage(test);
+        if (test.mode === 'skip') {
+            return testMessage.ignored();
+        }
+        return () => {
+            const fail = test.result!.state === 'fail';
+            return [
+                testMessage.started(),
+                fail ? testMessage.fail(test.result!.error) : '',
+                testMessage.finished(test.result!.duration || 0)
+            ].filter(Boolean);
+        }
+    }
+}
