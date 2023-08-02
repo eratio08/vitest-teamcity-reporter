@@ -4,15 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest",
-    "test:example": "vitest --run ./src/example.spec.ts",
-    "test:performance": "vitest --run ./src/performance"
+    "test": "vitest --run"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^5.1.6",
-    "vitest": "^0.34.0",
+    "vitest": "^0.34.1",
     "vitest-teamcity-reporter": "link:.."
   }
 }
