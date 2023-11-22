@@ -12,7 +12,7 @@ export class TestMessage extends Message {
     return this.generateTeamcityMessage(type, this.id, { ...parameters, name: this.name })
   }
 
-  fail(error: ErrorWithDiff | undefined): string {
+  fail = (error: ErrorWithDiff | undefined): string => {
     return this.generate('testFailed', {
       message: escape(error?.message ?? ''),
       details: escape(error?.stackStr ?? ''),
@@ -21,27 +21,27 @@ export class TestMessage extends Message {
     })
   }
 
-  started(): string {
+  started = (): string => {
     return this.generate('testStarted')
   }
 
-  finished(duration: number): string {
+  finished = (duration: number): string => {
     return this.generate('testFinished', { duration })
   }
 
-  ignored(): string {
+  ignored = (): string => {
     return this.generate('testIgnored')
   }
 
-  stdOut(out: string): string {
+  stdOut = (out: string): string => {
     return this.generate('testStdOut', { out })
   }
 
-  stdErr(out: string): string {
+  stdErr = (out: string): string => {
     return this.generate('testStdErr', { out })
   }
 
-  log(type: 'stdout' | 'stderr', out: string): string {
+  log = (type: 'stdout' | 'stderr', out: string): string => {
     return type === 'stdout' ? this.stdOut(out) : this.stdErr(out)
   }
 }

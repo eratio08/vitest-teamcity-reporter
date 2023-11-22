@@ -1,18 +1,22 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type UserConfig } from 'vitest'
 import { createVitest } from 'vitest/node'
 import { configDefaults } from 'vitest/config'
 import TeamCityReporter from '../app'
 import workCheckExpect from './simple/work-check.expect'
 import sequenceAsyncExpect from './sequence-check/async.expect'
-import sequenceAsyncExpectSecond from './sequence-check/async-2.expect'
+import sequenceAsyncSecondExpect from './sequence-check/async-2.expect'
+import missTestWithoutProblemExpect from './miss-test-result/miss-test-result-without-problem.expect'
+import missTestWithProblemExpect from './miss-test-result/miss-test-result-with-problem.expect'
 import sequenceSyncExpect from './sequence-check/sync.expect'
+import { compareResultWithExpect, generateExpectTest } from './utils'
 describe('main tests', () => {
   let consoleStub: any
 
-  const startTest = async(paths: string[]): Promise<void> => {
+  const startTest = async(paths: string[], config: UserConfig = {}): Promise<void> => {
     consoleStub = { info: vi.fn(), log: vi.fn() }
     const vitest = await createVitest('test', {
       ...configDefaults,
+      ...config,
       watch: false,
       reporters: new TeamCityReporter()
     })
@@ -26,14 +30,6 @@ describe('main tests', () => {
     log: consoleStub.log.mock.calls.flatMap((value: string[]) => value)
   })
 
-  const compareResultWithExpect = (expectedResult: string[][], result: string[]): void => {
-    expectedResult.forEach(([type, name], index) => {
-      const message = result[index]
-      expect(message).toContain(`##teamcity[${type} `)
-      expect(message).toContain(`name='${name}'`)
-    })
-  }
-
   it('should run test and log into info', async() => {
     await startTest(['./simple/work-check.spec.ts'])
     const { info } = getCalls()
@@ -44,35 +40,28 @@ describe('main tests', () => {
     compareResultWithExpect(workCheckExpect, info)
   })
 
+  it('should exclude case when miss result test if before/after hooks have a idle', async() => {
+    await startTest(['./miss-test-result'])
+    const { info } = getCalls()
+
+    expect(consoleStub.info).toHaveBeenCalled()
+    const expectMap = {
+      [missTestWithProblemExpect[0][1]]: missTestWithProblemExpect,
+      [missTestWithoutProblemExpect[0][1]]: missTestWithoutProblemExpect
+    }
+    generateExpectTest(info, expectMap)
+  })
+
   it('should run test and log into info', async() => {
     await startTest(['./sequence-check'])
     const { info } = getCalls()
 
-    const gropedMessage = info.reduce((acc: { [key in string]: string[] }, message: string) => {
-      const flowId = /flowId='(.+?)'/.exec(message)?.[1] ?? ''
-      if (acc[flowId] == null) {
-        acc[flowId] = []
-      }
-      acc[flowId].push(message)
-      return acc
-    }, {})
-
-    expect(Object.keys(gropedMessage)).lengthOf(3)
-
+    expect(consoleStub.info).toHaveBeenCalled()
     const expectMap = {
       [sequenceAsyncExpect[0][1]]: sequenceAsyncExpect,
-      [sequenceAsyncExpectSecond[0][1]]: sequenceAsyncExpectSecond,
+      [sequenceAsyncSecondExpect[0][1]]: sequenceAsyncSecondExpect,
       [sequenceSyncExpect[0][1]]: sequenceSyncExpect
     }
-
-    Object.values(gropedMessage).forEach((messages: string[]) => {
-      const fileName = /name='(.+?)'/.exec(messages[0])?.[1] ?? ''
-
-      const expectedResult = expectMap[fileName]
-
-      expect(expectedResult).not.toBeUndefined()
-
-      compareResultWithExpect(expectedResult, messages)
-    })
+    generateExpectTest(info, expectMap)
   })
 })

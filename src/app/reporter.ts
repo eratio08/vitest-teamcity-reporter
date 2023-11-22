@@ -1,12 +1,8 @@
 import { type Awaitable, type File, type Reporter, type TaskResultPack, type UserConsoleLog, type Vitest } from 'vitest'
 import { Printer } from './printer'
 
-export interface VitestLogger {
-  console: Console
-}
-
 class TeamCityReporter implements Reporter {
-  private logger!: VitestLogger
+  private logger!: Vitest['logger']
   private printer!: Printer
 
   onInit(ctx: Vitest): void {
