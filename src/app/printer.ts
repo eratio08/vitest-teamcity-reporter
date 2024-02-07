@@ -1,4 +1,13 @@
-import { type File, type Suite, type Task, type TaskResultPack, type Test, type UserConsoleLog, type Vitest, type ErrorWithDiff } from 'vitest'
+import {
+  type File,
+  type Suite,
+  type Task,
+  type TaskResultPack,
+  type Test,
+  type UserConsoleLog,
+  type Vitest,
+  type ErrorWithDiff,
+} from 'vitest'
 import { SuitMessage } from './messages/suite-message'
 import { escape } from './escape'
 import { TestMessage } from './messages/test-message'
@@ -11,16 +20,11 @@ export class Printer {
   private readonly fileMessageMap = new Map<string, PotentialMessages>()
   private readonly testConsoleMap = new Map<string, UserConsoleLog[]>()
 
-  constructor(private readonly logger: Vitest['logger']) {
-  }
+  constructor(private readonly logger: Vitest['logger']) {}
 
   public addFile = (file: File): void => {
     const suitMessage = new SuitMessage(file.id, escape(file.name))
-    const messages = [
-      suitMessage.started(),
-      ...file.tasks.flatMap(this.handleTask),
-      suitMessage.finished()
-    ]
+    const messages = [suitMessage.started(), ...file.tasks.flatMap(this.handleTask), suitMessage.finished()]
     this.fileMessageMap.set(file.id, messages)
   }
 
@@ -35,10 +39,12 @@ export class Printer {
 
   public handeUpdate = ([id, result]: TaskResultPack): void => {
     const messages = this.fileMessageMap.get(id)
-    if ((messages != null) && (result != null) && result.state !== 'run') {
+    if (messages != null && result != null && result.state !== 'run') {
       messages
-        .flatMap((message: PotentialMessage) => typeof message === 'string' ? message : message())
-        .forEach(message => { this.logger.console.info(message) })
+        .flatMap((message: PotentialMessage) => (typeof message === 'string' ? message : message()))
+        .forEach((message) => {
+          this.logger.console.info(message)
+        })
       this.fileMessageMap.delete(id)
     }
   }
@@ -56,37 +62,25 @@ export class Printer {
   private readonly handleSuite = (suite: Suite): PotentialMessage[] => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const suitMessage = new SuitMessage(suite.file!.id, escape(suite.name))
-    return [
-      suitMessage.started(),
-      ...suite.tasks.flatMap(this.handleTask),
-      suitMessage.finished()
-    ]
+    return [suitMessage.started(), ...suite.tasks.flatMap(this.handleTask), suitMessage.finished()]
   }
 
   private readonly handleTest = (test: Test): PotentialMessage => {
     const testMessage = new TestMessage(test)
-    if (test.mode === 'skip') {
+    if (test.mode === 'skip' || test.mode === 'todo') {
       return testMessage.ignored()
     }
     return () => {
-      const fail = (test.result == null) || test.result.state === 'fail'
+      const fail = test.result == null || test.result.state === 'fail'
 
       const logs = this.testConsoleMap.get(test.id) ?? []
-      const logsMessages = logs.map(log => testMessage.log(log.type, log.content))
+      const logsMessages = logs.map((log) => testMessage.log(log.type, log.content))
       const filedMessages = fail ? this.getTestErrors(test).map(testMessage.fail) : []
 
-      return [
-        testMessage.started(),
-        ...logsMessages,
-        ...filedMessages,
-        testMessage.finished(test.result?.duration ?? 0)
-      ].filter(Boolean)
+      return [testMessage.started(), ...logsMessages, ...filedMessages, testMessage.finished(test.result?.duration ?? 0)].filter(Boolean)
     }
   }
 
   private readonly getTestErrors = (test: Test): ErrorWithDiff[] =>
-    test.result?.errors ??
-      test.suite.result?.errors ??
-      test.file?.result?.errors ??
-      [new MissingResultError(test)]
+    test.result?.errors ?? test.suite.result?.errors ?? test.file?.result?.errors ?? [new MissingResultError(test)]
 }
