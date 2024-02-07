@@ -16,8 +16,8 @@ export class TestMessage extends Message {
     return this.generate('testFailed', {
       message: escape(error?.message ?? ''),
       details: escape(error?.stackStr ?? ''),
-      actual: escape(error?.actual ?? ''),
-      expected: escape(error?.expected ?? '')
+      actual: escape(error?.actual as string ?? ''),
+      expected: escape(error?.expected as string ?? ''),
     })
   }
 

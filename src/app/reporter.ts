@@ -16,7 +16,7 @@ class TeamCityReporter implements Reporter {
   }
 
   onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         packs.reverse().forEach(this.printer.handeUpdate)
         resolve()

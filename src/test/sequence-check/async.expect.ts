@@ -9,5 +9,5 @@ export default [
   ['testFinished', 'should be done after 1500ms'],
   ['testSuiteFinished', 'Test async done'],
   ['testSuiteFinished', 'Example sequence-check async file 1'],
-  ['testSuiteFinished', 'src/test/sequence-check/async.spec.ts']
+  ['testSuiteFinished', 'src/test/sequence-check/async.spec.ts'],
 ]

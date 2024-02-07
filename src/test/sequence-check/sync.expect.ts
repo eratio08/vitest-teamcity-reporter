@@ -9,5 +9,5 @@ export default [
   ['testFinished', 'should return false'],
   ['testSuiteFinished', 'Performance nested suit'],
   ['testSuiteFinished', 'Example sequence-check sync file'],
-  ['testSuiteFinished', 'src/test/sequence-check/sync.spec.ts']
+  ['testSuiteFinished', 'src/test/sequence-check/sync.spec.ts'],
 ]
