@@ -9,6 +9,7 @@ import missTestWithoutProblemExpect from './miss-test-result/miss-test-result-wi
 import missTestWithProblemExpect from './miss-test-result/miss-test-result-with-problem.expect'
 import sequenceSyncExpect from './sequence-check/sync.expect'
 import { compareResultWithExpect, generateExpectTest } from './utils'
+
 describe('main tests', () => {
   let consoleStub: any
 
@@ -36,7 +37,7 @@ describe('main tests', () => {
 
     expect(consoleStub.info).toHaveBeenCalled()
     expect(consoleStub.log).not.toHaveBeenCalled()
-    expect(info.length).toEqual(12)
+    expect(info.length).toEqual(13)
     compareResultWithExpect(workCheckExpect, info)
   })
 

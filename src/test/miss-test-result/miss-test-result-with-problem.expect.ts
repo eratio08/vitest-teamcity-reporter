@@ -8,5 +8,5 @@ export default [
   ['testFailed', 'second test delays the execution result'],
   ['testFinished', 'second test delays the execution result'],
   ['testSuiteFinished', 'With delayed hook'],
-  ['testSuiteFinished', 'src/test/miss-test-result/miss-test-result-with-problem.spec.ts']
+  ['testSuiteFinished', 'src/test/miss-test-result/miss-test-result-with-problem.spec.ts'],
 ]

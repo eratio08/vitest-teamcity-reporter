@@ -16,9 +16,23 @@ describe('Example test suite what generate 12 messages', () => {
     it.skip('should fired event test ignored', () => {
       expect(1).toEqual(2)
     })
+
+    it.todo('should fired event test ignored by todo', () => {
+      expect(1).toEqual(2)
+    })
   })
 
   describe.skip('should not fired any event', () => {
+    it('should not fired any event 2', () => {
+      expect(1).toEqual(2)
+    })
+
+    it('should not fired any event 2', () => {
+      expect(1).toEqual(2)
+    })
+  })
+
+  describe.todo('should not fired any event for todo', () => {
     it('should not fired any event 2', () => {
       expect(1).toEqual(2)
     })
