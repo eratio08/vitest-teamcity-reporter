@@ -12,12 +12,12 @@ export class TestMessage extends Message {
     return this.generateTeamcityMessage(type, this.id, { ...parameters, name: this.name })
   }
 
-  fail = (error: ErrorWithDiff | undefined): string => {
+  fail = (error: ErrorWithDiff): string => {
     return this.generate('testFailed', {
-      message: escape(error?.message ?? ''),
-      details: escape(error?.stackStr ?? ''),
-      actual: escape(error?.actual as string ?? ''),
-      expected: escape(error?.expected as string ?? ''),
+      message: error.message ?? '',
+      details: error.stackStr ?? '',
+      actual: (error.actual as string) ?? '',
+      expected: (error.expected as string) ?? '',
     })
   }
 
