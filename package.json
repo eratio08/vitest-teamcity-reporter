@@ -23,7 +23,7 @@
     "lint": "eslint ./src/**/*.ts --fix"
   },
   "devDependencies": {
-    "@types/node": "^20.4.7",
+    "@types/node": "^22.0.2",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@vitest/coverage-v8": "^2.0.3",
     "eslint": "^8.46.0",
