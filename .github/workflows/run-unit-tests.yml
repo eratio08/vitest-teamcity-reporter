@@ -33,3 +33,6 @@ jobs:
 
       - name: Run Unit-Tests
         run: pnpm test
+
+      - name: Build
+        run: pnpm run build
