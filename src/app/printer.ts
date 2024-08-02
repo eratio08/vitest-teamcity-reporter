@@ -20,7 +20,7 @@ export class Printer {
   private readonly fileMessageMap = new Map<string, PotentialMessages>()
   private readonly testConsoleMap = new Map<string, UserConsoleLog[]>()
 
-  constructor(private readonly logger: Vitest['logger']) {}
+  constructor(private readonly logger: Vitest['logger']) { }
 
   public addFile = (file: File): void => {
     const suitMessage = new SuitMessage(file.id, escape(file.name))
@@ -61,7 +61,7 @@ export class Printer {
 
   private readonly handleSuite = (suite: Suite): PotentialMessage[] => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const suitMessage = new SuitMessage(suite.file!.id, escape(suite.name))
+    const suitMessage = new SuitMessage(suite.file.id, escape(suite.name))
     return [suitMessage.started(), ...suite.tasks.flatMap(this.handleTask), suitMessage.finished()]
   }
 
@@ -82,5 +82,5 @@ export class Printer {
   }
 
   private readonly getTestErrors = (test: Test): ErrorWithDiff[] =>
-    test.result?.errors ?? test.suite.result?.errors ?? test.file?.result?.errors ?? [new MissingResultError(test)]
+    test.result?.errors ?? test.suite?.result?.errors ?? test.file?.result?.errors ?? [new MissingResultError(test)]
 }
