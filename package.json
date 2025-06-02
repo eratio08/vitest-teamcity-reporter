@@ -25,7 +25,7 @@
   "devDependencies": {
     "@types/node": "^22.1.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
-    "@vitest/coverage-v8": "^2.0.3",
+    "@vitest/coverage-v8": "^3.2.0",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-config-standard-with-typescript": "^43.0.0",
