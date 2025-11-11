@@ -1,7 +1,7 @@
-import { type ErrorWithDiff, type Test } from 'vitest'
+import { type TestCase } from 'vitest/node'
 
-export default class MissingResultError extends Error implements ErrorWithDiff {
-  constructor(test: Test) {
-    super(`Test: "${test.name}" from - "${test.file?.filepath ?? 'unknown'}" missing a result after file test process finished`)
+export default class MissingResultError extends Error {
+  constructor(testCase: TestCase) {
+    super(`Test: "${testCase.fullName}" from - "${testCase.module.moduleId}" missing a result after file test process finished`)
   }
 }

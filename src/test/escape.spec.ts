@@ -1,4 +1,5 @@
-import { describe, it, expect, type Test } from 'vitest'
+import { describe, it, expect } from 'vitest'
+import { type TestCase } from 'vitest/node'
 import { escape } from '../app/escape'
 import { SuitMessage } from '../app/messages/suite-message'
 import { TestMessage } from '../app/messages/test-message'
@@ -52,13 +53,14 @@ describe('Checking message escaping functionality', () => {
     const testName = testString
     const fileId = 'fileId'
 
-    const test = new TestMessage({
-      name: testName,
-      file: {
-        id: fileId,
+    const testCase = {
+      fullName: testName,
+      module: {
+        moduleId: fileId,
       },
-      type: 'test',
-    } as unknown as Test)
+    } as unknown as TestCase
+
+    const test = new TestMessage(testCase)
 
     const escapedMessage = test.started()
     expect(escapedMessage).toStrictEqual(`##teamcity[testStarted flowId='${fileId}' name='${expectedString}']`)

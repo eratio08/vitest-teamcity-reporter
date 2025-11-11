@@ -1,5 +1,11 @@
-import { type Awaitable, type File, type Reporter, type TaskResultPack, type UserConsoleLog, type Vitest } from 'vitest'
+import { type Reporter, type TestModule, type TestSuite, type TestCase, type Vitest } from 'vitest/node'
 import { Printer } from './printer'
+
+interface UserConsoleLog {
+  taskId?: string
+  type: 'stdout' | 'stderr'
+  content: string
+}
 
 class TeamCityReporter implements Reporter {
   private logger!: Vitest['logger']
@@ -10,27 +16,36 @@ class TeamCityReporter implements Reporter {
     this.printer = new Printer(this.logger)
   }
 
-  onCollected(files?: File[]): Awaitable<void> {
-    files?.forEach(this.printer.addFile)
-    return Promise.resolve()
+  onTestModuleCollected(testModule: TestModule): void {
+    this.printer.onModuleCollected(testModule)
   }
 
-  onTaskUpdate(packs: TaskResultPack[]): Awaitable<void> {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        packs.reverse().forEach(this.printer.handeUpdate)
-        resolve()
-      })
-    })
+  onTestSuiteReady(testSuite: TestSuite): void {
+    this.printer.onSuiteReady(testSuite)
   }
 
-  onUserConsoleLog(log: UserConsoleLog): Awaitable<void> {
+  onTestCaseReady(testCase: TestCase): void {
+    this.printer.onTestReady(testCase)
+  }
+
+  onTestCaseResult(testCase: TestCase): void {
+    this.printer.onTestResult(testCase)
+  }
+
+  onTestSuiteResult(testSuite: TestSuite): void {
+    this.printer.onSuiteResult(testSuite)
+  }
+
+  onTestModuleEnd(testModule: TestModule): void {
+    this.printer.onModuleEnd(testModule)
+  }
+
+  onUserConsoleLog(log: UserConsoleLog): void {
     if (log.taskId != null) {
       this.printer.addTestConsoleLog(log.taskId, log)
     } else {
       this.logger.console.log(log)
     }
-    return Promise.resolve()
   }
 }
 
