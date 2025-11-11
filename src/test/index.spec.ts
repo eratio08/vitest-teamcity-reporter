@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, type UserConfig } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createVitest } from 'vitest/node'
 import { configDefaults } from 'vitest/config'
 import TeamCityReporter from '../app'
@@ -13,7 +13,7 @@ import { compareResultWithExpect, generateExpectTest } from './utils'
 describe('main tests', () => {
   let consoleStub: any
 
-  const startTest = async(paths: string[], config: UserConfig = {}): Promise<void> => {
+  const startTest = async(paths: string[], config: Record<string, any> = {}): Promise<void> => {
     consoleStub = { info: vi.fn(), log: vi.fn() }
     const vitest = await createVitest('test', {
       ...configDefaults,
