@@ -1,14 +1,10 @@
 import { type TestModule, type TestSuite, type TestCase, type Vitest } from 'vitest/node'
+import { type UserConsoleLog } from 'vitest'
+import { type TestError } from '@vitest/utils'
 import { SuitMessage } from './messages/suite-message'
 import { escape } from './escape'
 import { TestMessage } from './messages/test-message'
 import MissingResultError from './error/missing-result.error'
-
-interface UserConsoleLog {
-  taskId?: string
-  type: 'stdout' | 'stderr'
-  content: string
-}
 
 export class Printer {
   private readonly testConsoleMap = new Map<string, UserConsoleLog[]>()
@@ -18,7 +14,7 @@ export class Printer {
   constructor(private readonly logger: Vitest['logger']) {}
 
   public onModuleCollected(testModule: TestModule): void {
-    const suitMessage = new SuitMessage(testModule.moduleId, escape(testModule.moduleId))
+    const suitMessage = new SuitMessage(testModule.moduleId, escape(testModule.relativeModuleId))
     this.log(suitMessage.started())
     this.reportedSuites.add(testModule.moduleId)
   }
@@ -27,8 +23,7 @@ export class Printer {
     if (testSuite.options.mode === 'skip' || testSuite.options.mode === 'todo') {
       return
     }
-    const suiteName = this.extractSuiteName(testSuite.fullName)
-    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(suiteName))
+    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(testSuite.name))
     this.log(suitMessage.started())
     this.reportedSuites.add(testSuite.id)
   }
@@ -37,7 +32,7 @@ export class Printer {
     if (!this.isTestInReportedSuite(testCase)) {
       return
     }
-    if (testCase.options.mode === 'skip' || testCase.options.mode === 'todo') {
+    if (testCase.result().state === 'skipped') {
       const testMessage = new TestMessage(testCase)
       this.log(testMessage.ignored())
       return
@@ -89,8 +84,7 @@ export class Printer {
     if (testSuite.options.mode === 'skip' || testSuite.options.mode === 'todo') {
       return
     }
-    const suiteName = this.extractSuiteName(testSuite.fullName)
-    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(suiteName))
+    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(testSuite.name))
     this.log(suitMessage.finished())
     this.reportedSuites.delete(testSuite.id)
   }
@@ -114,11 +108,6 @@ export class Printer {
     this.logger.console.info(message)
   }
 
-  private extractSuiteName(fullName: string): string {
-    const parts = fullName.split(' > ')
-    return parts[parts.length - 1]
-  }
-
   private isTestInReportedSuite(testCase: TestCase): boolean {
     let current: TestCase | TestSuite | TestModule = testCase
     while (current.type !== 'module') {
@@ -130,34 +119,34 @@ export class Printer {
     return true
   }
 
-  private getTestErrors(testCase: TestCase): Array<{ message: string; stackStr?: string; actual?: unknown; expected?: unknown }> {
+  private getTestErrors(testCase: TestCase): TestError[] {
     const result = testCase.result()
-    
+
     // Check test errors first
     if (result.errors && result.errors.length > 0) {
-      return Array.from(result.errors)
+      return [...result.errors]
     }
-    
+
     // Check parent suite errors (e.g., from failed hooks)
     let current: TestCase | TestSuite | TestModule = testCase.parent
     while (current.type !== 'module') {
       if (current.type === 'suite') {
         const suiteErrors = current.errors()
         if (suiteErrors.length > 0) {
-          return Array.from(suiteErrors)
+          return suiteErrors
         }
       }
       current = current.parent
     }
-    
+
     // Check module errors
     if (current.type === 'module') {
       const moduleErrors = current.errors()
       if (moduleErrors.length > 0) {
-        return Array.from(moduleErrors)
+        return moduleErrors
       }
     }
-    
+
     return [new MissingResultError(testCase)]
   }
 }

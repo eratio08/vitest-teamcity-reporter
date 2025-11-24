@@ -1,11 +1,6 @@
 import { type Reporter, type TestModule, type TestSuite, type TestCase, type Vitest } from 'vitest/node'
+import { type UserConsoleLog } from 'vitest'
 import { Printer } from './printer'
-
-interface UserConsoleLog {
-  taskId?: string
-  type: 'stdout' | 'stderr'
-  content: string
-}
 
 class TeamCityReporter implements Reporter {
   private logger!: Vitest['logger']

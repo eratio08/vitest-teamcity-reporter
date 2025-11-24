@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 
 export const generateExpectTest = (info: string[], expectMap: Record<string, string[][]>): void => {
-  const gropedMessage = info.reduce((acc: { [key in string]: string[] }, message: string) => {
+  const groupedMessages = info.reduce((acc: { [key in string]: string[] }, message: string) => {
     const flowId = /flowId='(.+?)'/.exec(message)?.[1] ?? ''
     if (acc[flowId] == null) {
       acc[flowId] = []
@@ -10,9 +10,9 @@ export const generateExpectTest = (info: string[], expectMap: Record<string, str
     return acc
   }, {})
 
-  expect(Object.keys(gropedMessage)).lengthOf(Object.keys(expectMap).length)
+  expect(Object.keys(groupedMessages)).lengthOf(Object.keys(expectMap).length)
 
-  Object.values(gropedMessage).forEach((messages: string[]) => {
+  Object.values(groupedMessages).forEach((messages: string[]) => {
     const fileName = /name='(.+?)'/.exec(messages[0])?.[1] ?? ''
     
     // Try to match by full path or filename

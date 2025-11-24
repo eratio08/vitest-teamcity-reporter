@@ -26,6 +26,7 @@
     "@types/node": "^24.0.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@vitest/coverage-v8": "^4.0.0",
+    "@vitest/utils": "^4.0.13",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-config-standard-with-typescript": "^43.0.0",
@@ -39,7 +40,7 @@
   },
   "peerDependencies": {
     "typescript": "3.x || 4.x || 5.x",
-    "vitest": ">=4.0.0"
+    "vitest": ">=3.0.0"
   },
   "author": "Eike Lurz<eike.lurz@tuta.io>",
   "license": "MIT"

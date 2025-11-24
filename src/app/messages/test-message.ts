@@ -1,29 +1,22 @@
 import { type TestCase } from 'vitest/node'
+import { type TestError } from '@vitest/utils'
 import { Message, type Parameters } from './message'
-
-interface ErrorLike {
-  message: string
-  stackStr?: string
-  actual?: unknown
-  expected?: unknown
-}
 
 export class TestMessage extends Message {
   constructor(testCase: TestCase) {
-    const testName = testCase.fullName.split(' > ').pop() ?? testCase.fullName
-    super(testCase.module.moduleId, testName)
+    super(testCase.module.moduleId, testCase.name)
   }
 
   protected generate(type: string, parameters: Parameters = {}): string {
     return this.generateTeamcityMessage(type, this.id, { ...parameters, name: this.name })
   }
 
-  fail = (error: ErrorLike): string => {
+  fail = (error: TestError): string => {
     return this.generate('testFailed', {
-      message: error.message ?? '',
-      details: error.stackStr ?? '',
-      actual: (error.actual as string) ?? '',
-      expected: (error.expected as string) ?? '',
+      message: error.message,
+      details: error.stack ?? '',
+      actual: String(error.actual ?? ''),
+      expected: String(error.expected ?? ''),
     })
   }
 
