@@ -2,7 +2,7 @@
 
 This reporter has been migrated from deprecated Vitest 3 APIs to Vitest 4 stable APIs. The TeamCity output format remains identical.
 
-**Breaking Change:** This version requires Vitest 4.0.0 or later. If you're using Vitest 2.x or 3.x, use `vitest-teamcity-reporter@0.3.x` instead.
+**Breaking Change:** This version requires Vitest 3.0.0 or later. If you're using Vitest 2.x or earlier, use `vitest-teamcity-reporter@0.3.x` instead.
 
 ## What Changed
 
@@ -26,14 +26,16 @@ onTestModuleEnd(testModule: TestModule): void
 
 ### Type Imports
 
-All types now come from `vitest/node` with new names:
+Types now come from `vitest/node` and `vitest` with new names:
 
 ```typescript
 // Old
-import { type File, type Suite, type Test } from 'vitest'
+import { type File, type Suite, type Test, type UserConsoleLog } from 'vitest'
 
 // New
 import { type TestModule, type TestSuite, type TestCase } from 'vitest/node'
+import { type UserConsoleLog } from 'vitest'
+import { type TestError } from '@vitest/utils'
 ```
 
 ### Architecture Change
@@ -46,16 +48,17 @@ import { type TestModule, type TestSuite, type TestCase } from 'vitest/node'
 
 - `file.tasks` → `testModule.children`
 - `test.result` → `testCase.result()` (property → method)
-- `test.name` → `testCase.fullName`
+- `test.name` → `testCase.name` (unchanged)
 - `file.id` → `testModule.moduleId`
+- `file.filepath` → `testModule.relativeModuleId` (for display)
 
 ### Test/Suite Naming
 
-Vitest 4's `fullName` includes the full hierarchy ("Suite A > Suite B > Test"). We extract just the last segment to maintain the old format.
+Test and suite names use their direct `.name` property, maintaining a flat naming structure.
 
-### Skipped Suite Handling
+### Skipped Test Handling
 
-Added logic to track which suites are reported. Tests inside `describe.skip()` or `describe.todo()` blocks are not reported, but individual `it.skip()` tests are.
+Skipped tests are detected using `testCase.result().state === 'skipped'`. Tests inside `describe.skip()` or `describe.todo()` blocks are not reported, but individual `it.skip()` tests are.
 
 ### Hook Failure Handling
 
@@ -69,25 +72,25 @@ When `beforeAll`/`afterAll` hooks fail, Vitest 4 skips `onTestReady` but still c
 
 The old code looked for errors on `test.result?.errors ?? test.suite?.result?.errors ?? test.file?.result?.errors`.
 
-The new code traverses the parent hierarchy explicitly:
+The new code uses proper types from `@vitest/utils` and traverses the parent hierarchy explicitly:
 
 ```typescript
-private getTestErrors(testCase: TestCase) {
+private getTestErrors(testCase: TestCase): TestError[] {
   // Check test errors
-  if (result.errors?.length > 0) return Array.from(result.errors)
+  if (result.errors?.length > 0) return [...result.errors]
 
   // Check parent suite/module errors (hook failures)
   let current = testCase.parent
   while (current.type !== 'module') {
     if (current.type === 'suite' && current.errors().length > 0) {
-      return Array.from(current.errors())
+      return current.errors()
     }
     current = current.parent
   }
 
   // Check module errors
   const moduleErrors = current.errors()
-  if (moduleErrors.length > 0) return Array.from(moduleErrors)
+  if (moduleErrors.length > 0) return moduleErrors
 
   return [new MissingResultError(testCase)]
 }
