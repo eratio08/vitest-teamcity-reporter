@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { type TestCase } from 'vitest/node'
 import { escape } from '../app/escape'
-import { SuitMessage } from '../app/messages/suite-message'
+import { SuiteMessage } from '../app/messages/suite-message'
 import { TestMessage } from '../app/messages/test-message'
 
 const escapeMap = {
@@ -37,7 +37,7 @@ describe('Checking message escaping functionality', () => {
     const messageName = 'messageName'
     const messageType = 'messageType'
 
-    const message = new SuitMessage(messageId, messageName)
+    const message = new SuiteMessage(messageId, messageName)
 
     const escapedParameters = message.generate(messageType, {
       testString,
@@ -54,7 +54,7 @@ describe('Checking message escaping functionality', () => {
     const fileId = 'fileId'
 
     const testCase = {
-      fullName: testName,
+      name: testName,
       module: {
         moduleId: fileId,
       },

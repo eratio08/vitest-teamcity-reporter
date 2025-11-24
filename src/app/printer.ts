@@ -1,7 +1,7 @@
-import { type TestModule, type TestSuite, type TestCase, type Vitest } from 'vitest/node'
+import { type TestModule, type TestSuite, type TestCase, type Vitest, type TaskOptions } from 'vitest/node'
 import { type UserConsoleLog } from 'vitest'
 import { type TestError } from '@vitest/utils'
-import { SuitMessage } from './messages/suite-message'
+import { SuiteMessage } from './messages/suite-message'
 import { escape } from './escape'
 import { TestMessage } from './messages/test-message'
 import MissingResultError from './error/missing-result.error'
@@ -14,17 +14,17 @@ export class Printer {
   constructor(private readonly logger: Vitest['logger']) {}
 
   public onModuleCollected(testModule: TestModule): void {
-    const suitMessage = new SuitMessage(testModule.moduleId, escape(testModule.relativeModuleId))
-    this.log(suitMessage.started())
+    const suiteMessage = new SuiteMessage(testModule.moduleId, escape(testModule.relativeModuleId))
+    this.log(suiteMessage.started())
     this.reportedSuites.add(testModule.moduleId)
   }
 
   public onSuiteReady(testSuite: TestSuite): void {
-    if (testSuite.options.mode === 'skip' || testSuite.options.mode === 'todo') {
+    if (this.isSkippedOrTodo(testSuite)) {
       return
     }
-    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(testSuite.name))
-    this.log(suitMessage.started())
+    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escape(testSuite.name))
+    this.log(suiteMessage.started())
     this.reportedSuites.add(testSuite.id)
   }
 
@@ -46,12 +46,12 @@ export class Printer {
     if (!this.isTestInReportedSuite(testCase)) {
       return
     }
-    if (testCase.options.mode === 'skip' || testCase.options.mode === 'todo') {
+    if (this.isSkippedOrTodo(testCase)) {
       return
     }
 
     const testMessage = new TestMessage(testCase)
-    
+
     // If testStarted wasn't called (e.g., due to hook failure), emit it now
     if (!this.startedTests.has(testCase.id)) {
       this.log(testMessage.started())
@@ -69,7 +69,7 @@ export class Printer {
     // Check for errors even if state is not 'failed' (e.g., hook failures)
     const errors = this.getTestErrors(testCase)
     const hasRealErrors = errors.length > 0 && !(errors[0] instanceof MissingResultError)
-    
+
     if (result.state === 'failed' || hasRealErrors) {
       errors.forEach((error) => {
         this.log(testMessage.fail(error))
@@ -81,17 +81,17 @@ export class Printer {
   }
 
   public onSuiteResult(testSuite: TestSuite): void {
-    if (testSuite.options.mode === 'skip' || testSuite.options.mode === 'todo') {
+    if (this.isSkippedOrTodo(testSuite)) {
       return
     }
-    const suitMessage = new SuitMessage(testSuite.module.moduleId, escape(testSuite.name))
-    this.log(suitMessage.finished())
+    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escape(testSuite.name))
+    this.log(suiteMessage.finished())
     this.reportedSuites.delete(testSuite.id)
   }
 
   public onModuleEnd(testModule: TestModule): void {
-    const suitMessage = new SuitMessage(testModule.moduleId, escape(testModule.moduleId))
-    this.log(suitMessage.finished())
+    const suiteMessage = new SuiteMessage(testModule.moduleId, escape(testModule.moduleId))
+    this.log(suiteMessage.finished())
     this.reportedSuites.delete(testModule.moduleId)
   }
 
@@ -106,6 +106,13 @@ export class Printer {
 
   private log(message: string): void {
     this.logger.console.info(message)
+  }
+
+  private isSkippedOrTodo(item: { options: { mode?: TaskOptions['mode'] } }): boolean {
+    if (item.options.mode === undefined) {
+      return false
+    }
+    return ['skip', 'todo'].includes(item.options.mode)
   }
 
   private isTestInReportedSuite(testCase: TestCase): boolean {
@@ -123,7 +130,7 @@ export class Printer {
     const result = testCase.result()
 
     // Check test errors first
-    if (result.errors && result.errors.length > 0) {
+    if (result.errors !== undefined && result.errors.length > 0) {
       return [...result.errors]
     }
 
@@ -139,12 +146,10 @@ export class Printer {
       current = current.parent
     }
 
-    // Check module errors
-    if (current.type === 'module') {
-      const moduleErrors = current.errors()
-      if (moduleErrors.length > 0) {
-        return moduleErrors
-      }
+    // Check module errors (current is always 'module' here)
+    const moduleErrors = current.errors()
+    if (moduleErrors.length > 0) {
+      return moduleErrors
     }
 
     return [new MissingResultError(testCase)]

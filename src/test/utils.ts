@@ -14,14 +14,14 @@ export const generateExpectTest = (info: string[], expectMap: Record<string, str
 
   Object.values(groupedMessages).forEach((messages: string[]) => {
     const fileName = /name='(.+?)'/.exec(messages[0])?.[1] ?? ''
-    
+
     // Try to match by full path or filename
     let expectedResult = expectMap[fileName]
-    if (!expectedResult && fileName.includes('/')) {
+    if (fileName.includes('/')) {
       // Extract the relative path portion and try to find an exact match
       // For absolute paths like /Users/.../src/test/file.spec.ts
       // Try to match against relative paths like src/test/file.spec.ts
-      const matchingKey = Object.keys(expectMap).find(key => {
+      const matchingKey = Object.keys(expectMap).find((key) => {
         if (key.includes('/') && fileName.endsWith(key)) {
           return true
         }
@@ -30,7 +30,7 @@ export const generateExpectTest = (info: string[], expectMap: Record<string, str
         const keyFileName = key.split('/').pop() ?? ''
         return justFileName === keyFileName
       })
-      if (matchingKey) {
+      if (matchingKey !== undefined) {
         expectedResult = expectMap[matchingKey]
       }
     }

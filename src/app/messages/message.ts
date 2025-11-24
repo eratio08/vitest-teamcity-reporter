@@ -10,7 +10,7 @@ export abstract class Message {
 
   protected generateParameters(parameters: Parameters): string {
     return Object.entries(parameters)
-      .map(([key, value]) => `${key}='${escape(value ?? '')}'`)
+      .map(([key, value]) => `${key}='${escape(value)}'`)
       .join(' ')
   }
 
