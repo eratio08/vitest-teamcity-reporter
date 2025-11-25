@@ -1,6 +1,6 @@
 import { Message, type Parameters } from './message'
 
-export class SuitMessage extends Message {
+export class SuiteMessage extends Message {
   generate(type: string, parameters: Parameters = {}): string {
     return this.generateTeamcityMessage(type, this.id, { ...parameters, name: this.name })
   }
