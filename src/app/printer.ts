@@ -1,10 +1,10 @@
-import { type TestModule, type TestSuite, type TestCase, type Vitest, type TaskOptions } from 'vitest/node'
-import { type UserConsoleLog } from 'vitest'
-import { type TestError } from '@vitest/utils'
-import { SuiteMessage } from './messages/suite-message'
-import { escape } from './escape'
-import { TestMessage } from './messages/test-message'
+import type { TestError } from '@vitest/utils'
+import type { UserConsoleLog } from 'vitest'
+import type { TaskOptions, TestCase, TestModule, TestSuite, Vitest } from 'vitest/node'
 import MissingResultError from './error/missing-result.error'
+import { escapeSpecials } from './escape'
+import { SuiteMessage } from './messages/suite-message'
+import { TestMessage } from './messages/test-message'
 
 export class Printer {
   private readonly testConsoleMap = new Map<string, UserConsoleLog[]>()
@@ -14,7 +14,7 @@ export class Printer {
   constructor(private readonly logger: Vitest['logger']) {}
 
   public onModuleCollected(testModule: TestModule): void {
-    const suiteMessage = new SuiteMessage(testModule.moduleId, escape(testModule.relativeModuleId))
+    const suiteMessage = new SuiteMessage(testModule.moduleId, escapeSpecials(testModule.relativeModuleId))
     this.log(suiteMessage.started())
     this.reportedSuites.add(testModule.moduleId)
   }
@@ -23,7 +23,7 @@ export class Printer {
     if (this.isSkippedOrTodo(testSuite)) {
       return
     }
-    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escape(testSuite.name))
+    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escapeSpecials(testSuite.name))
     this.log(suiteMessage.started())
     this.reportedSuites.add(testSuite.id)
   }
@@ -84,13 +84,13 @@ export class Printer {
     if (this.isSkippedOrTodo(testSuite)) {
       return
     }
-    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escape(testSuite.name))
+    const suiteMessage = new SuiteMessage(testSuite.module.moduleId, escapeSpecials(testSuite.name))
     this.log(suiteMessage.finished())
     this.reportedSuites.delete(testSuite.id)
   }
 
   public onModuleEnd(testModule: TestModule): void {
-    const suiteMessage = new SuiteMessage(testModule.moduleId, escape(testModule.moduleId))
+    const suiteMessage = new SuiteMessage(testModule.moduleId, escapeSpecials(testModule.moduleId))
     this.log(suiteMessage.finished())
     this.reportedSuites.delete(testModule.moduleId)
   }

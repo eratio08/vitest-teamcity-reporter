@@ -1,8 +1,8 @@
-export const escape = (str: string | number = ''): string => {
+export const escapeSpecials = (str: string | number = ''): string => {
   return (
     str
       .toString()
-      // eslint-disable-next-line no-control-regex
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: needed to remove ANSI codes
       .replace(/\x1B.*?m/g, '')
       .replace(/\|/g, '||')
       .replace(/\n/g, '|n')

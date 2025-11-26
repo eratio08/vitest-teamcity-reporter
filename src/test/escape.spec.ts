@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { type TestCase } from 'vitest/node'
-import { escape } from '../app/escape'
+import { describe, expect, it } from 'vitest'
+import type { TestCase } from 'vitest/node'
+import { escapeSpecials } from '../app/escape'
 import { SuiteMessage } from '../app/messages/suite-message'
 import { TestMessage } from '../app/messages/test-message'
 
@@ -25,10 +25,10 @@ const expectedString = Object.values(escapeMap).join('')
 
 describe('Checking message escaping functionality', () => {
   it('escaping of simple string or number is correct', () => {
-    const escapedString = escape(testString)
+    const escapedString = escapeSpecials(testString)
     expect(escapedString).toStrictEqual(expectedString)
 
-    const escapedNumber = escape(testNumber)
+    const escapedNumber = escapeSpecials(testNumber)
     expect(escapedNumber).toStrictEqual(expectedNumber)
   })
 
@@ -45,7 +45,7 @@ describe('Checking message escaping functionality', () => {
     })
 
     expect(escapedParameters).toStrictEqual(
-      `##teamcity[${messageType} flowId='${messageId}' testString='${expectedString}' testNumber='${expectedNumber}' name='${messageName}']`
+      `##teamcity[${messageType} flowId='${messageId}' testString='${expectedString}' testNumber='${expectedNumber}' name='${messageName}']`,
     )
   })
 

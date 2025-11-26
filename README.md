@@ -32,9 +32,4 @@ export default defineConfig({
 ```
 
 ### Reporting Build Statistics
-For enabling "[Reporting Build Statistics](https://www.jetbrains.com/help/teamcity/service-messages.html#Reporting+Build+Statistics)"
-for TeamCity you may add a "[teamcity](https://istanbul.js.org/docs/advanced/alternative-reporters/#teamcity)" coverage reporter 
-that is the default provided by vitest (
-[vitest](https://vitest.dev/guide/coverage.html#coverage-setup) doc,
-[istanbul](https://istanbul.js.org/docs/advanced/alternative-reporters/#teamcity) doc
-)
+For enabling "[Reporting Build Statistics](https://www.jetbrains.com/help/teamcity/service-messages.html#Reporting+Build+Statistics)" for TeamCity you may add a "[teamcity](https://istanbul.js.org/docs/advanced/alternative-reporters/#teamcity)" coverage reporter that is the default provided by vitest ([vitest](https://vitest.dev/guide/coverage.html#coverage-setup) doc, [istanbul](https://istanbul.js.org/docs/advanced/alternative-reporters/#teamcity) doc)
