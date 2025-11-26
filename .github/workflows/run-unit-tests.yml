@@ -1,7 +1,7 @@
 name: Run Unit-Tests
 on: [pull_request]
 concurrency:
-  group: ${{ github.workflow }} - ${{ github.event.pull_request.id }}
+  group: ${{ github.workflow }} - ${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
   unit-tests:
@@ -10,7 +10,7 @@ jobs:
     steps:
       # https://github.com/marketplace/actions/checkout
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # https://github.com/marketplace/actions/setup-pnpm
       - uses: pnpm/action-setup@v4.2.0
@@ -22,7 +22,7 @@ jobs:
 
       # https://github.com/marketplace/actions/setup-node-js-environment
       - name: Setup NodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           cache: pnpm
           node-version: lts/*
@@ -30,6 +30,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install ${{ github.actor != 'dependabot[bot]' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
+
+      - name: Lint
+        run: pnpm run lint:ci
 
       - name: Run Unit-Tests
         run: pnpm test

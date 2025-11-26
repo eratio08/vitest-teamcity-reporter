@@ -11,5 +11,5 @@ export default [
   ['testIgnored', 'should fired event test ignored by todo'],
   ['testSuiteFinished', 'should fired event suit start'],
   ['testSuiteFinished', 'Example test suite what generate 12 messages'],
-  ['testSuiteFinished', 'src/test/simple/work-check.spec.ts']
+  ['testSuiteFinished', 'src/test/simple/work-check.spec.ts'],
 ]

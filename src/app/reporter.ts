@@ -1,5 +1,5 @@
-import { type Reporter, type TestModule, type TestSuite, type TestCase, type Vitest } from 'vitest/node'
-import { type UserConsoleLog } from 'vitest'
+import type { UserConsoleLog } from 'vitest'
+import type { Reporter, TestCase, TestModule, TestSuite, Vitest } from 'vitest/node'
 import { Printer } from './printer'
 
 class TeamCityReporter implements Reporter {

@@ -1,5 +1,5 @@
-import { type TestCase } from 'vitest/node'
-import { type TestError } from '@vitest/utils'
+import type { TestError } from '@vitest/utils'
+import type { TestCase } from 'vitest/node'
 import { Message, type Parameters } from './message'
 
 export class TestMessage extends Message {

@@ -1,19 +1,19 @@
 {
-    "compilerOptions": {
-        "target": "ES2017",
-        "module": "CommonJS",
-        "declaration": true,
-        "outDir": "lib/",
-        "lib": ["ES2021"],
-        "strict": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "alwaysStrict": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "moduleResolution": "node",
-    },
-    "include": ["src"],
-    "exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "CommonJS",
+    "declaration": true,
+    "outDir": "lib/",
+    "lib": ["ES2021"],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
