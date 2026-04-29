@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "module": "CommonJS",
+    "module": "nodenext",
     "declaration": true,
     "outDir": "lib/",
+    "rootDir": "./src",
     "lib": ["ES2021"],
     "strict": true,
     "noImplicitAny": true,
@@ -12,7 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "nodenext"
   },
   "include": ["src"],
   "exclude": ["node_modules"]
