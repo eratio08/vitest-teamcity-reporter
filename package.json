@@ -17,9 +17,8 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "clean": "rimraf lib",
     "test": "vitest --run src/test/index.spec.ts",
-    "build": "pnpm clean && tsc -p tsconfig.lib.json",
+    "build": "rolldown -c && tsc -p tsconfig.lib.json --emitDeclarationOnly",
     "lint": "biome check --write",
     "lint:ci": "biome check --reporter=github"
   },
@@ -28,7 +27,7 @@
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.0.0",
     "@vitest/utils": "^4.0.13",
-    "rimraf": "^6.0.1",
+    "rolldown": "^1.2.0",
     "typescript": "^5.1.6",
     "vitest": "^4.0.0"
   },
