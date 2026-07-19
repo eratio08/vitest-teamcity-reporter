@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 describe('With delayed hook', () => {
   beforeAll(async () => {
     return await new Promise((resolve) => setTimeout(resolve, 10000))
-  }, 100)
+  }, 10000)
 
   it('first test delays the execution result', async () => {
     expect('true').toEqual('true')

@@ -10,6 +10,8 @@ import sequenceSyncExpect from './sequence-check/sync.expect'
 import workCheckExpect from './simple/work-check.expect'
 import { compareResultWithExpect, generateExpectTest } from './utils'
 
+vi.setConfig({ testTimeout: 15000 })
+
 describe('main tests', () => {
   // biome-ignore lint/suspicious/noExplicitAny: fine for the test
   let consoleStub: any
