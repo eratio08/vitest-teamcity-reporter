@@ -3,6 +3,7 @@ import type { TestCase } from 'vitest/node'
 import { escapeSpecials } from '../app/escape'
 import { SuiteMessage } from '../app/messages/suite-message'
 import { TestMessage } from '../app/messages/test-message'
+import { TestMetadataMessage } from '../app/messages/test-metadata-message'
 
 const escapeMap = {
   '\x1B1m': '',
@@ -64,5 +65,25 @@ describe('Checking message escaping functionality', () => {
 
     const escapedMessage = test.started()
     expect(escapedMessage).toStrictEqual(`##teamcity[testStarted flowId='${fileId}' name='${expectedString}']`)
+  })
+
+  it('test metadata values are correctly escaped', () => {
+    const testCase = {
+      name: 'test name',
+      fullName: testString,
+      module: {
+        moduleId: 'fileId',
+        relativeModuleId: testString,
+      },
+    } as unknown as TestCase
+
+    const metadata = new TestMetadataMessage(testCase)
+
+    expect(metadata.sourceFile()).toStrictEqual(
+      `##teamcity[testMetadata flowId='fileId' name='sourceFile' value='${expectedString}']`,
+    )
+    expect(metadata.vitestFullName()).toStrictEqual(
+      `##teamcity[testMetadata flowId='fileId' name='vitestFullName' value='${expectedString}']`,
+    )
   })
 })

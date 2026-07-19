@@ -6,6 +6,7 @@ import { escapeSpecials } from './escape'
 import { RunErrorMessage } from './messages/run-error-message'
 import { SuiteMessage } from './messages/suite-message'
 import { TestMessage } from './messages/test-message'
+import { TestMetadataMessage } from './messages/test-metadata-message'
 
 export class Printer {
   private readonly testConsoleMap = new Map<string, UserConsoleLog[]>()
@@ -61,6 +62,10 @@ export class Printer {
       this.log(testMessage.started())
     }
     this.startedTests.delete(testCase.id)
+
+    const metadataMessage = new TestMetadataMessage(testCase)
+    this.log(metadataMessage.sourceFile())
+    this.log(metadataMessage.vitestFullName())
 
     const result = testCase.result()
 

@@ -40,8 +40,26 @@ describe('main tests', () => {
 
     expect(consoleStub.info).toHaveBeenCalled()
     expect(consoleStub.log).not.toHaveBeenCalled()
-    expect(info.length).toEqual(13)
+    expect(info.length).toEqual(17)
     compareResultWithExpect(workCheckExpect, info)
+
+    const metadata = info.filter((message) => message.startsWith('##teamcity[testMetadata '))
+    expect(metadata).toHaveLength(4)
+    expect(metadata[0]).toContain("name='sourceFile'")
+    expect(metadata[0]).toContain("value='src/test/simple/work-check.spec.ts'")
+    expect(metadata[1]).toContain("name='vitestFullName'")
+    expect(metadata[1]).toContain(
+      "value='Example test suite what generate 12 messages > should fired message about test start and finished'",
+    )
+  })
+
+  it('reports metadata once for a retried test', async () => {
+    await startTest(['./retry/retry.spec.ts'])
+    const { info } = getCalls()
+
+    expect(info.filter((message) => message.startsWith('##teamcity[testStarted '))).toHaveLength(1)
+    expect(info.filter((message) => message.startsWith('##teamcity[testMetadata '))).toHaveLength(2)
+    expect(info.filter((message) => message.startsWith('##teamcity[testFinished '))).toHaveLength(1)
   })
 
   it('should exclude case when miss result test if before/after hooks have a idle', async () => {
