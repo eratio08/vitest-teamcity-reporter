@@ -1,8 +1,9 @@
-import type { TestError } from '@vitest/utils'
+import type { SerializedError, TestError } from '@vitest/utils'
 import type { UserConsoleLog } from 'vitest'
 import type { TaskOptions, TestCase, TestModule, TestSuite, Vitest } from 'vitest/node'
 import MissingResultError from './error/missing-result.error'
 import { escapeSpecials } from './escape'
+import { RunErrorMessage } from './messages/run-error-message'
 import { SuiteMessage } from './messages/suite-message'
 import { TestMessage } from './messages/test-message'
 
@@ -96,6 +97,30 @@ export class Printer {
     const suiteMessage = new SuiteMessage(escapeSpecials(testModule.moduleId), escapeSpecials(testModule.moduleId))
     this.log(suiteMessage.finished())
     this.reportedSuites.delete(testModule.moduleId)
+  }
+
+  public onTestRunEnd(unhandledErrors: ReadonlyArray<SerializedError>): void {
+    if (unhandledErrors.length === 0) {
+      return
+    }
+
+    const flowId = 'vitest-unhandled-errors'
+    const suiteMessage = new SuiteMessage(flowId, 'Vitest unhandled errors')
+    this.log(suiteMessage.started())
+
+    unhandledErrors.forEach((error, index) => {
+      const errorMessage = new RunErrorMessage(
+        flowId,
+        `Unhandled error ${index + 1}`,
+        `vitest-unhandled-error-${index}`,
+      )
+      this.log(errorMessage.started())
+      this.log(errorMessage.failed(error))
+      this.log(errorMessage.finished())
+      this.log(errorMessage.buildProblem(error))
+    })
+
+    this.log(suiteMessage.finished())
   }
 
   public addTestConsoleLog(id: string, log: UserConsoleLog): void {

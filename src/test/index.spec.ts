@@ -56,6 +56,38 @@ describe('main tests', () => {
     generateExpectTest(info, expectMap)
   })
 
+  it('reports unhandled errors as TeamCity failures', async () => {
+    await startTest(['./unhandled-error.spec.ts'])
+    const { info } = getCalls()
+
+    const suiteStart = info.find(
+      (message) =>
+        message.startsWith('##teamcity[testSuiteStarted') && message.includes("name='Vitest unhandled errors'"),
+    )
+    const suiteFlowId = suiteStart?.match(/flowId='([^']+)'/)?.[1]
+
+    expect(suiteFlowId).toBeDefined()
+    expect(info.some((message) => message.startsWith(`##teamcity[testStarted flowId='${suiteFlowId}'`))).toBe(true)
+    expect(info.some((message) => message.startsWith('##teamcity[testFailed '))).toBe(true)
+    expect(info.some((message) => message.includes("message='unhandled rejection from fixture'"))).toBe(true)
+    expect(info.some((message) => message.includes("details='Error: unhandled rejection from fixture"))).toBe(true)
+    expect(
+      info.some((message) =>
+        message.includes(
+          "##teamcity[buildProblem description='Vitest unhandled error: unhandled rejection from fixture'",
+        ),
+      ),
+    ).toBe(true)
+    expect(
+      info.some((message) => message.includes("description='Vitest unhandled error: Unknown unhandled error'")),
+    ).toBe(true)
+
+    const problemIdentities = info
+      .filter((message) => message.startsWith('##teamcity[buildProblem '))
+      .map((message) => message.match(/identity='([^']+)'/)?.[1])
+    expect(new Set(problemIdentities).size).toBe(2)
+  })
+
   it('should run test and log into info', async () => {
     await startTest(['./sequence-check'])
     const { info } = getCalls()
