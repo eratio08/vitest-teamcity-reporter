@@ -23,13 +23,13 @@
     "lint:ci": "biome check --reporter=github"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.4",
-    "@types/node": "^24.0.0",
-    "@vitest/coverage-v8": "^4.0.0",
-    "@vitest/utils": "^4.0.13",
+    "@biomejs/biome": "2.5.4",
+    "@types/node": "^24.13.3",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/utils": "^4.1.10",
     "rolldown": "^1.2.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.0.0"
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "typescript": "4.x || 5.x || 6.x",
