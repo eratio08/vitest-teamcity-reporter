@@ -1,3 +1,4 @@
+import type { SerializedError } from '@vitest/utils'
 import type { UserConsoleLog } from 'vitest'
 import type { Reporter, TestCase, TestModule, TestSuite, Vitest } from 'vitest/node'
 import { Printer } from './printer'
@@ -33,6 +34,10 @@ class TeamCityReporter implements Reporter {
 
   onTestModuleEnd(testModule: TestModule): void {
     this.printer.onModuleEnd(testModule)
+  }
+
+  onTestRunEnd(_testModules: ReadonlyArray<TestModule>, unhandledErrors: ReadonlyArray<SerializedError>): void {
+    this.printer.onTestRunEnd(unhandledErrors)
   }
 
   onUserConsoleLog(log: UserConsoleLog): void {
