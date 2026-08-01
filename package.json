@@ -28,7 +28,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/utils": "^4.1.10",
     "rolldown": "^1.2.0",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
   "peerDependencies": {
