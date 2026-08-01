@@ -23,7 +23,7 @@
     "lint:ci": "biome check --reporter=github"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.4",
+    "@biomejs/biome": "2.5.6",
     "@types/node": "^24.13.3",
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/utils": "^4.1.10",
