@@ -25,7 +25,7 @@ export class TestMessage extends Message {
   }
 
   finished(duration: number): string {
-    return this.generate('testFinished', { duration })
+    return this.generate('testFinished', { duration: Math.round(duration) })
   }
 
   ignored(): string {
