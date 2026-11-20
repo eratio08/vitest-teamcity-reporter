@@ -53,6 +53,17 @@ describe('main tests', () => {
     )
   })
 
+  it('reports test duration in rounded milliseconds', async () => {
+    await startTest(['./sequence-check/async.spec.ts'])
+    const { info } = getCalls()
+
+    const finished = info.filter((message) => message.startsWith('##teamcity[testFinished '))
+    expect(finished).toHaveLength(2)
+    finished.forEach((message) => {
+      expect(message).toMatch(/ duration='\d+' /)
+    })
+  })
+
   it('reports metadata once for a retried test', async () => {
     await startTest(['./retry/retry.spec.ts'])
     const { info } = getCalls()
